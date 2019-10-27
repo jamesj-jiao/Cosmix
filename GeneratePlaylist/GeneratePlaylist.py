@@ -9,6 +9,7 @@ import json
 import random
 import string
 import pickle
+import time
 
 with open('genremap.json', 'r') as f:
     raw_loaded_genres = json.loads(f.read())
@@ -61,6 +62,7 @@ knn_genres = KNeighborsClassifier(n_neighbors=3)
 knn_genres.fit(genre_embeddings, genre_index)
 
 def create_playlist(title, num_songs):
+    timeout = time.time() + 5
     title = title.lower().replace('/', ' ').replace('-', ' ')
     playlist = []
     title_embedding = np.array(keep_genre([[title]]))
@@ -91,5 +93,7 @@ def create_playlist(title, num_songs):
             flags[rand_genre] = 0
         else:
             playlist.append(rand_song)
+        if time.time() > timeout:
+            break
     return playlist
 

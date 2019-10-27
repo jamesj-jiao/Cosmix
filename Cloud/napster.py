@@ -1,4 +1,4 @@
-API_KEY = 'NWRhNzc3NTgtN2U2ZC00Mjk5LThkNzItODZlMzM5MzdmYWM'
+API_KEY = 'NWRhNzc3NTgtN2U2ZC00Mjk5LThkNzItODZlMzM5MzdmYWMx'
 
 import requests
 import json
@@ -93,7 +93,8 @@ def tag(id):
 
 def create_genre_json(sp, playlist_id):
 	isrc_list = playlist_to_isrc(sp, playlist_id)
-	for i, t in enumerate(isrcs):
+	genremap = {}
+	for t in isrc_list:
 		try:
 			print('.', end='')
 			sys.stdout.flush()
@@ -106,7 +107,11 @@ def create_genre_json(sp, playlist_id):
 					genremap[g] = [t]
 				#print()
 		except:
-			print('Could not find track', p['tracks'][i]['name'])
-	f = open("../GeneratePlaylist/genremap.json", 'w')
-	json.dumps(f, genremap)
+			print("Error in loading song")
+	print(genremap)
+	f = open("genremap.json", 'w')
+	json.dump(genremap, f)
+
+#sp = spotipy.Spotify(auth="BQA7TSell4nnxO4laytS_Do9KIlhJo1HCi1cvR40o6sy60WMeBDXxKSVxPjY6yvwzd4durNTuO3M9EwCNTSWSgcSv2CLptUM0I9c1aHxgyOO40tOstNUqvwkGLY6MOkozQFTEEahveQhkkB4nguIcg4cECs2je7-8Qn3XR_Ep2_-pIp-xQ5Q-jMWODRkXAdvLKsHI40VSiEkZW9mbJl21w")
+#create_genre_json(sp, '3atj13mrB86ZfC8amwAVst')
 #print(list(playlists()))
