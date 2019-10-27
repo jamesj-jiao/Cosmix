@@ -95,7 +95,6 @@ def create_genre_json(isrc_list):
 	genremap = {}
 	for t in isrc_list:
 		try:
-			print('.', end='')
 			sys.stdout.flush()
 			#info(track(t))
 			genres = [genre(g)['name'] for g in track(t)['links']['genres']['ids']]
@@ -106,7 +105,7 @@ def create_genre_json(isrc_list):
 					genremap[g] = [t]
 				#print()
 		except:
-			print("Error in loading song")
+			pass
 	print(genremap)
 	f = open("GeneratePlaylist/genremap.json", 'w')
 	json.dump(genremap, f)
