@@ -5,6 +5,11 @@ from utils import get_val_from_request
 import json
 import secrets
 import string
+from Cloud.GeneratePlaylist.GeneratePlaylist import create_playlist
+from Cloud.napster import *
+from Cloud.AddToPartyPlaylist import *
+
+
 
 CODE_ALPHABET = string.ascii_letters + string.digits
 
@@ -40,12 +45,17 @@ def join_code(request):
     group_ref.update({'members': firestore.ArrayUnion([username])})
     return 'Found'
 
+
 def gen_playlist(request):
-    sp = get_val_from_request(request, 'sp')
     name = get_val_from_request(request, 'name')
     num_songs = get_val_from_request(request, 'numSongs')
+    group_isrc_list = get_val_from_request(request,'isrc')
+
+    create_genre_json(group_isrc_list)
 
     create_playlist(name, num_songs)
+
+    #FINISH
 
 def playlists(request):
     """Return the user's playlists for a given token and service."""
