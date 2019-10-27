@@ -27,23 +27,28 @@ SERVICES = {
     }
 }
 
-def new_code(request):
-    code = ''.join(secrets.choice(CODE_ALPHABET) for _ in range(10))
-    db.collection('groups').doc(code).set({
+def new_party(request):
+    pid = ''.join(secrets.choice(CODE_ALPHABET) for _ in range(10))
+    db.collection('parties').doc(pid).set({
         'members': [],
     })
-    return code
+    return pid
 
-def join_code(request):
-    code = get_val_from_request(request, 'code')
-    username = get_val_from_request(request, 'username')
-    group_ref = db.collection('groups').document(code)
+def check_party(request):
+    pid = get_val_from_request(request, 'id')
+    party_ref = db.collection('parties').document(pid)
     try:
-        group_ref.get()
+        party_ref.get()
+        return 'Found'
     except:
         return 'Not found'
-    group_ref.update({'members': firestore.ArrayUnion([username])})
-    return 'Found'
+
+def join_party(request):
+    pid = get_val_from_request(request, 'id')
+    username = get_val_from_request(request, 'username')
+
+    party_ref = db.collection('parties').document(pid)
+    party_ref.update({'members': firestore.ArrayUnion([username])})
 
 
 def gen_playlist(request):
