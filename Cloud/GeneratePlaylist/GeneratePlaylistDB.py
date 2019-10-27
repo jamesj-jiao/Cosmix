@@ -73,7 +73,7 @@ def generate_playlist(raw_loaded_genres, name, num):
     knn_genres.fit(genre_embeddings, genre_index)
 
     def create_playlist(title, num_songs):
-        timeout = time.time() + 5
+        timeout = time.time() + 2
         title = title.lower().replace('/', ' ').replace('-', ' ')
         playlist = []
         title_embedding = np.array(keep_genre([[title]]))
