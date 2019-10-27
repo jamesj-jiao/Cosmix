@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class Adapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    var songs = listOf<Song>()
+    var songs : MutableList<Song> = mutableListOf<Song>()
 
     override fun getItemCount() = songs.size
 
@@ -26,7 +26,12 @@ class Adapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     fun updateData(newData: Set<Song>) {
-        songs = (songs union newData).toList()
+        songs = (songs union newData).toMutableList()
+        notifyDataSetChanged()
+    }
+
+    fun addSong(song: Song) {
+        songs.add(song)
         notifyDataSetChanged()
     }
 

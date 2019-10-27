@@ -24,10 +24,10 @@ class PartyActivity : AppCompatActivity() {
         partyId = intent.getStringExtra(PARTY_ID)
 
         FirebaseFirestore.getInstance().collection(PARTIES).document(partyId)
-            .addSnapshotListener { snapshot, e ->
+            .addSnapshotListener { snapshot, _ ->
                 if (snapshot?.data != null) {
                     var data = snapshot.data as Map<String, List<String>>
-                    adapter.updateData(AsyncUtils.getSongs(data.get(ALL_TRACKS)))
+                    adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
                 }
             }
 

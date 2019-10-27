@@ -12,10 +12,6 @@ const val GET_FACTS = "get_facts"
 const val CHECK_PARTY = "check_party"
 const val NEW_PARTY = "new_party"
 
-fun partyExists(id: String) : Boolean {
-    return false
-}
-
 fun callFunction(url: String, params: Map<String, String>) : String {
 
     var formatted = "$url?"
