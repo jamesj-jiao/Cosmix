@@ -40,6 +40,14 @@ def join_code(request):
     group_ref.update({'members': firestore.ArrayUnion([username])})
     return 'Found'
 
+def gen_playlist(request):
+    sp = get_val_from_request(request, 'sp')
+    name = get_val_from_request(request, 'name')
+    num_songs = get_val_from_request(request, 'numSongs')
+
+    create_playlist(name, num_songs)
+
+
 def playlists(request):
     """Return the user's playlists for a given token and service."""
     service = get_val_from_request(request, 'service')
