@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_join"
+        android:icon="@drawable/join_icon"
+        android:title="@string/title_join" />
+
+    <item
+        android:id="@+id/navigation_create"
+        android:icon="@drawable/create_icon"
+        android:title="@string/title_create" />
+</menu>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Streamline</string>
+    <string name="title_create">Create</string>
+    <string name="title_join">Join</string>
+</resources>
