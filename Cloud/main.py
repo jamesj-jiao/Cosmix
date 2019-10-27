@@ -1,6 +1,6 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
-import newutils as utils
+import utils
 from utils import get_val_from_request
 import json
 import secrets
