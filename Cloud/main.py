@@ -47,7 +47,6 @@ def gen_playlist(request):
 
     create_playlist(name, num_songs)
 
-
 def playlists(request):
     """Return the user's playlists for a given token and service."""
     service = get_val_from_request(request, 'service')
