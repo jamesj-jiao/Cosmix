@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_join">
+
+    <fragment
+        android:id="@+id/navigation_create"
+        android:name="com.example.streamline.ui.create.CreateFragment"
+        android:label="@string/title_create"
+        tools:layout="@layout/fragment_create" >
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_join"
+        android:name="com.example.streamline.ui.join.JoinFragment"
+        android:label="@string/title_join"
+        tools:layout="@layout/fragment_join" >
+    </fragment>
+</navigation>

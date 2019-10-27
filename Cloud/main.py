@@ -87,3 +87,13 @@ def add(request):
 
     sp = spotipy.Spotify(auth=token)
     party_ref.update({'filtTracks': add_to_party_playlist(sp, track_isrcs, num=10)})
+
+def save(request):
+    """Add filtered songs to a playlist."""
+    party_id = get_val_from_request(request, 'id')
+    name = get_val_from_request(request, 'name')
+    token = get_val_from_request(request, 'token')
+
+    party = db.collection('parties').document(party_id).get().to_dict()
+    isrcs = party['track_isrcs']
+    utils.new_playlist(name, isrcs, token)
