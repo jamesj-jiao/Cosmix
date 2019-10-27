@@ -73,11 +73,11 @@ def playlist_add_tracks(sp, playlist_id, tracks, position=None):
     return sp._post("playlists/%s/tracks" % plid,
                       payload=ftracks, position=position)
 
-def playlist_to_features_dict(sp, playlist_id):
+def playlist_to_features_dict(sp, isrc_list):
     #user_id = get_val_from_request(request, 'user')
     #playlist_id = get_val_from_request(request, 'playlist')
     d = {}
-    for item in get_playlist_tracks(sp, playlist_id)['items']:
-        spotify_id = item['track']['id']
+    for isrc in isrc_list:
+        spotify_id = isrc_to_id(sp, isrc)
         d[id_to_isrc(sp, spotify_id)] = features_from_id(sp, spotify_id)
     return str(d)

@@ -1,6 +1,7 @@
 from apple import *
 from spotify import *
 
+
 def get_val_from_request(request, key):
     request_json = request.get_json()
     if request.args and key in request.args:
