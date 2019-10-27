@@ -45,7 +45,6 @@ def keep_genre(genre_array):
 		genre = genre_array[i][0]
 		for word in genre.split(): #For each word in each genre
 			try: #If the word embedding is found
-				print(embeddings_index[word])
 				word_embedding = embeddings_index[word]
 				genre_embedding = [a+b for a,b in zip(genre_embedding, word_embedding)] #Sum the word embeddings
 			except:

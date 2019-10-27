@@ -85,9 +85,11 @@ def add(request):
     track_isrcs = SERVICES[service]['track_isrcs'](playlist_id, token)
 
     party_ref.update({'allTracks': firestore.ArrayUnion(track_isrcs)})
+    party = db.collection('parties').document(party_id).get().to_dict()
+    isrcs = party['allTracks']
 
     sp = spotipy.Spotify(auth=token)
-    party_ref.update({'filtTracks': add_to_party_playlist(sp, track_isrcs, num=10)})
+    party_ref.update({'filtTracks': add_to_party_playlist(sp, isrcs, num=10)})
 
 def save(request):
     """Add filtered songs to a playlist."""
