@@ -98,4 +98,4 @@ def save(request):
 
     party = db.collection('parties').document(party_id).get().to_dict()
     isrcs = party['track_isrcs']
-    utils.new_playlist_tracks(name, isrcs, token)
+    utils.new_playlist(name, isrcs, token)
