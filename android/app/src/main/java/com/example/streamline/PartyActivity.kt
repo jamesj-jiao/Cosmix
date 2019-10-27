@@ -5,11 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-
+import com.google.firebase.firestore.FirebaseFirestore
 
 class PartyActivity : AppCompatActivity() {
 
@@ -27,17 +23,14 @@ class PartyActivity : AppCompatActivity() {
 
         partyId = intent.getStringExtra(PARTY_ID)
 
-        //only watch all tracks
-        FirebaseDatabase.getInstance().reference.child(PARTIES).child(partyId).child(ALL_TRACKS).child("SDKFYKS")
-            .addListenerForSingleValueEvent(object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    adapter.updateData(
-                        readSnapshot(dataSnapshot)
-                    )
+        FirebaseFirestore.getInstance().collection(PARTIES).document(partyId)
+            .addSnapshotListener { snapshot, e ->
+                if (snapshot?.data != null) {
+                    var data = snapshot.data as Map<String, List<String>>
+                    adapter.updateData(AsyncUtils.getSongs(data.get(ALL_TRACKS)))
                 }
+            }
 
-                override fun onCancelled(databaseError: DatabaseError) {}
-            })
         initRecycler()
     }
 
