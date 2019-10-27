@@ -15,6 +15,7 @@ const val NEW_PARTY = "new_party"
 const val PLAYLISTS = "playlists"
 const val ADD = "add"
 const val SAVE = "save"
+const val SAVE_GENRE = "gen_playlist"
 
 fun callFunction(url: String, params: Map<String, String>) : String {
 
@@ -79,4 +80,8 @@ fun add(id: String, playlist: String, token: String) : Boolean {
 
 fun save(partyId: String, name: String, token: String) {
     callFunction("$FUNCTION$SAVE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token)))
+}
+
+fun saveGenre(partyId: String, name: String, token: String) {
+    callFunction("$FUNCTION$SAVE_GENRE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token), Pair("numSongs", "5")))
 }

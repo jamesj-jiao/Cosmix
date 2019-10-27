@@ -1,6 +1,8 @@
 package com.example.streamline;
 
+import android.app.ProgressDialog;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.function.Consumer;
 
 public class AsyncUtils {
     public static Set<Song> getSongs(List<String> ids) {
@@ -83,16 +86,26 @@ public class AsyncUtils {
         return playlists;
     }
 
-    public static boolean add(String id, String playlist, String token) {
-        try {
-            return Executors.newSingleThreadExecutor().submit(() -> CloudUtilsKt.add(id, playlist, token)).get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
-        return false;
+    public static void add(String id, String playlist, String token, ProgressDialog toast, Consumer<Boolean> onFinish) {
+        Executors.newSingleThreadExecutor().submit(() -> {
+            Log.wtf("TOAST","IT'S A TOAST");
+            boolean found = CloudUtilsKt.add(id, playlist, token);
+            toast.dismiss();
+            onFinish.accept(found);
+        });
     }
 
-    public static void save(String id, String name, String token) {
-        Executors.newSingleThreadExecutor().execute(() -> CloudUtilsKt.save(id, name, token));
+    public static void save(String id, String name, String token, Toast toast) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            CloudUtilsKt.save(id, name.replace(" ","%20"), token);
+            toast.cancel();
+        });
+    }
+
+    public static void saveGenre(String id, String name, String token, Toast toast) {
+        Executors.newSingleThreadExecutor().execute(() -> {
+            CloudUtilsKt.saveGenre(id, name.replace(" ","%20"), token);
+            toast.cancel();
+        });
     }
 }

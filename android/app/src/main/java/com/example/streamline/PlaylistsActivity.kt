@@ -1,5 +1,6 @@
 package com.example.streamline
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,8 @@ class PlaylistsActivity : AppCompatActivity() {
 
         token = intent.getStringExtra("token")
         partyID = intent.getStringExtra("partyID")
+
+        Log.wtf("AAAAAAA", token)
 
         val playlists: List<Playlist> = AsyncUtils.getPlaylists("spotify", token)
 
@@ -51,13 +54,20 @@ class PlaylistAdapter(var context: Context, val data: List<Playlist>) : Recycler
             name.text = curr.name
 
             itemView.setOnClickListener {
-                if (AsyncUtils.add(partyID, curr.id, token)) {
-                    val intent = Intent(it.context, PartyActivity::class.java)
-                    intent.putExtra("token", token)
-                    intent.putExtra(PARTY_ID, partyID)
-                    it.context.startActivity(intent)
-                } else {
-                    Toast.makeText(it.context, "Playlist is empty. Cannot add.", Toast.LENGTH_SHORT).show()
+                //val toast = Toast.makeText(context, "Uploading to shared playlist", Toast.LENGTH_LONG)
+                //toast.show()
+                val progressDialog = ProgressDialog(context)
+                progressDialog.setTitle("Uploading...")
+                progressDialog.show()
+                AsyncUtils.add(partyID, curr.id, token, progressDialog) { found ->
+                    if (found) {
+                        val intent = Intent(it.context, PartyActivity::class.java)
+                        intent.putExtra("token", token)
+                        intent.putExtra(PARTY_ID, partyID)
+                        it.context.startActivity(intent)
+                    } else {
+                        Toast.makeText(it.context, "Playlist is empty. Cannot add.", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }

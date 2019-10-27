@@ -67,8 +67,33 @@ class PartyActivity : AppCompatActivity() {
 
             builder.setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                 if (authToken != null) {
-                    AsyncUtils.save(partyId, input.text.toString(), authToken)
-                    Toast.makeText(this@PartyActivity, "Uploaded to Spotify", Toast.LENGTH_SHORT).show()
+                    val toast = Toast.makeText(this@PartyActivity, "Uploadeding to Spotify", Toast.LENGTH_LONG * Toast.LENGTH_LONG * Toast.LENGTH_LONG)
+                    toast.show()
+                    AsyncUtils.save(partyId, input.text.toString(), authToken, toast)
+                } else {
+                    Toast.makeText(this@PartyActivity, "Must log in to spotify first!", Toast.LENGTH_SHORT).show()
+                }
+            })
+            builder.setNegativeButton("Cancel", DialogInterface.OnClickListener() { dialog, which ->
+                dialog.cancel()
+            })
+
+            builder.show();
+        }
+
+        findViewById<Button>(R.id.spotifygenre).setOnClickListener {
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Genre name")
+
+            var viewInflated = LayoutInflater.from(this).inflate(R.layout.text_dialog, findViewById(android.R.id.content), false)
+            val input: EditText = viewInflated.findViewById(R.id.input)
+            builder.setView(viewInflated)
+
+            builder.setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                if (authToken != null) {
+                    var toast = Toast.makeText(this@PartyActivity, "Uploading to Spotify", Toast.LENGTH_LONG * Toast.LENGTH_LONG * Toast.LENGTH_LONG)
+                    toast.show()
+                    AsyncUtils.saveGenre(partyId, input.text.toString(), authToken, toast)
                 } else {
                     Toast.makeText(this@PartyActivity, "Must log in to spotify first!", Toast.LENGTH_SHORT).show()
                 }
