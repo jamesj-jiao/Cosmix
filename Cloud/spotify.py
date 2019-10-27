@@ -21,6 +21,20 @@ def id_to_isrc(sp, spotify_id):
     """Convert a spotify id to an isrc."""
     return sp.track(spotify_id)['external_ids']['isrc']
 
+def isrc_to_id(sp, isrc):
+    return sp.search(q='isrc:{}'.format(isrc), type='track')['tracks']['items'][0]['id']
+
+def features_from_id(sp, spotify_id):
+    return sp.audio_features(sp, spotify_id)[0]
+
+def isrc_to_facts(sp, isrc):
+    track = sp.track(isrc_to_id(sp, isrc))
+    return {'name': track['name'], 'artist': track['artists'][0]['name']}
+
+def get_audio_features(sp, isrc):
+    #isrc = get_val_from_request(request, 'isrc')
+    return features_from_id(isrc_to_id(sp, isrc))
+
 def spotify_track_isrcs(playlist_id, token):
     sp = spotipy.Spotify(auth=token)
     isrc_list = []
