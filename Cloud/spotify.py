@@ -55,17 +55,20 @@ def get_playlist_tracks(sp, playlist_id, limit=100, offset=0):
     plid = sp._get_id('playlist', playlist_id)
     return sp._get("playlists/{}/tracks?limit={}&offset={}".format(plid, limit, offset))
 
-def add_tracks(token, playlist_id, track_ids):
-    if token:
-        sp = spotipy.Spotify(auth=token)
-        sp.trace = False
-        # username = sp.me()
-        # return username
+def new_playlist(name, isrcs, token):
+    sp = spotipy.Spotify(auth=token)
+    uid = sp.me()['id']
 
-        results = playlist_add_tracks(sp, playlist_id, track_ids)
-        return results
+    playlists = sp.user_playlists(uid)['items']
+    matching = [p for p in playlists if p['name'] == name]
+    if matching:
+        playlist = matching[0]
     else:
-        return "Can't get token"
+        playlist = sp.user_playlist_create(uid, name, public=False)
+    ids = [isrc_to_id(sp, isrc) for isrc in isrcs]
+
+    # playlist_add_tracks(sp, playlist['id'], ids)
+    sp.user_playlist_add_tracks(uid, playlist['id'], ids)
 
 def playlist_add_tracks(sp, playlist_id, tracks, position=None):
     plid = sp._get_id('playlist', playlist_id)
