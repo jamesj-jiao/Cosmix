@@ -1,18 +1,18 @@
-import firebase_admin
-from firebase_admin import credentials, firestore
-import utils.
-from utils import get_val_from_request
-import json
-import secrets
+from google.cloud import firestore
+import google.cloud.exceptions
+import utils
+#from utils import get_val_from_request
+# import json
+# import secrets
 import string
-from GeneratePlaylist.GeneratePlaylist import create_playlist
-from napster import *
+from schema import Playlist
+# from GeneratePlaylist.GeneratePlaylist import create_playlist
+# from napster import *
 from AddToPartyPlaylist import *
 
 CODE_ALPHABET = string.ascii_letters + string.digits
 
-default_app = firebase_admin.initialize_app()
-db = firestore.client()
+db = firestore.Client()
 
 SERVICES = {
     'apple': {
@@ -25,43 +25,49 @@ SERVICES = {
     }
 }
 
+
 def new_party(request):
-    party_id = get_val_from_request(request, 'codeName')
-    db.collection('parties').doc(party_id).set({
-        'allTracks': [],
-        'filtTracks': [],
-    })
+    party_id = get_val_from_request(request, 'id')
+    db.collection('parties').document(party_id).set({'allTracks': [], 'filtTracks': []})
+
 
 def check_party(request):
     party_id = get_val_from_request(request, 'id')
-    party_ref = db.collection('parties').doc(party_id)
+    party_ref = db.collection('parties').document(party_id)
     try:
-        party_ref.get()
+        party_ref.get().to_dict()
         return 'Found'
-    except:
+    except google.cloud.exceptions.NotFound:
         return 'Not found'
 
-def gen_playlist(request):
-    name = get_val_from_request(request, 'name')
-    num_songs = get_val_from_request(request, 'numSongs')
-    party_id = get_val_from_request(request, 'partyID')
 
-    isrc_list = db.collection('parties').doc(party_id).get()['filtTracks']
+def get_facts(request):
+    isrc = get_val_from_request(request, 'isrc')
+    if isrc:
+        return str(isrc_to_facts(isrc))
+    return "Problem with get_facts"
 
-    create_genre_json(isrc_list)
-
-    create_playlist(name, num_songs)
-
-    #FINISH!!
+# def gen_playlist(request):
+#     name = get_val_from_request(request, 'name')
+#     num_songs = get_val_from_request(request, 'numSongs')
+#     party_id = get_val_from_request(request, 'partyID')
+#
+#     isrc_list = db.collection('parties').document(party_id).get()['filtTracks']
+#
+#     create_genre_json(isrc_list)
+#
+#     create_playlist(name, num_songs)
+#
+#     #FINISH!!
 
 def playlists(request):
     """Return the user's playlists for a given token and service."""
     service = get_val_from_request(request, 'service')
     token = get_val_from_request(request, 'token')
     playlists = list(SERVICES[service]['playlists'](token))
-    for p in playlists:
-        p.id = service + '/' + p.id
+    playlists = [Playlist(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
     return json.dumps(playlists)
+
 
 def add(request):
     """Add all songs from a given playlist to the group's music."""
@@ -69,12 +75,12 @@ def add(request):
     combined_id = get_val_from_request(request, 'playlist')
     token = get_val_from_request(request, 'token')
 
-    party_ref = db.collection('parties').doc(party_id)
-    sp = spotipy.Spotify(auth=token)
+    party_ref = db.collection('parties').document(party_id)
 
     service, playlist_id = combined_id.split('/')
     track_isrcs = SERVICES[service]['track_isrcs'](playlist_id, token)
 
     party_ref.update({'allTracks': firestore.ArrayUnion(track_isrcs)})
 
-    party_ref.update({'filtTracks': add_to_party_playlist(sp, track_isrcs, num = 10)})
+    sp = spotipy.Spotify(auth=token)
+    party_ref.update({'filtTracks': add_to_party_playlist(sp, track_isrcs, num=10)})

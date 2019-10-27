@@ -25,7 +25,7 @@ def isrc_to_id(sp, isrc):
     return sp.search(q='isrc:{}'.format(isrc), type='track')['tracks']['items'][0]['id']
 
 def features_from_id(sp, spotify_id):
-    return sp.audio_features(sp, spotify_id)[0]
+    return sp.audio_features(spotify_id)[0]
 
 def isrc_to_facts(sp, isrc):
     track = sp.track(isrc_to_id(sp, isrc))
