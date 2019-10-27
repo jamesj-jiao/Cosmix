@@ -4,6 +4,7 @@ import android.util.Log
 import java.net.HttpURLConnection
 import java.net.URL
 import com.google.gson.Gson
+import java.io.FileNotFoundException
 import java.util.concurrent.Callable
 
 const val FUNCTION= "https://us-central1-streamline-5ab87.cloudfunctions.net/"
@@ -11,6 +12,9 @@ const val FUNCTION= "https://us-central1-streamline-5ab87.cloudfunctions.net/"
 const val GET_FACTS = "get_facts"
 const val CHECK_PARTY = "check_party"
 const val NEW_PARTY = "new_party"
+const val PLAYLISTS = "playlists"
+const val ADD = "add"
+const val SAVE = "save"
 
 fun callFunction(url: String, params: Map<String, String>) : String {
 
@@ -41,6 +45,14 @@ fun getDict(json: String) : Map<String, String> {
     return map as Map<String, String>
 }
 
+fun getList(list: String) : List<Map<String, String>> {
+    val gson = Gson()
+    val map = gson.fromJson(list, List::class.java)
+    return map as List<Map<String, String>>
+}
+
+
+
 fun getSongFacts(isrc: String) : Map<String, String> = getDict(callFunction("$FUNCTION$GET_FACTS", mapOf(Pair("isrc", isrc))))
 
 fun checkParty(partyId: String) : Boolean =
@@ -48,3 +60,23 @@ fun checkParty(partyId: String) : Boolean =
 
 fun newParty(partyId: String) : Boolean =
     callFunction("$FUNCTION$NEW_PARTY", mapOf(Pair("id", partyId))) == "Success"
+
+fun playlists(service: String, token: String) : List<Map<String, String>> {
+    return getList(callFunction("$FUNCTION$PLAYLISTS", mapOf(Pair("service", service), Pair("token", token))))
+}
+
+fun add(id: String, playlist: String, token: String) : Boolean {
+    try {
+        callFunction(
+            "$FUNCTION$ADD",
+            mapOf(Pair("id", id), Pair("playlist", playlist), Pair("token", token))
+        )
+        return true
+    } catch (e: FileNotFoundException) {
+        return false
+    }
+}
+
+fun save(partyId: String, name: String, token: String) {
+    callFunction("$FUNCTION$SAVE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token)))
+}
