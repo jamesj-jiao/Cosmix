@@ -29,16 +29,21 @@ SERVICES = {
 def new_party(request):
     party_id = get_val_from_request(request, 'id')
     db.collection('parties').document(party_id).set({'allTracks': [], 'filtTracks': []})
+    return 'Success'
 
 
 def check_party(request):
-    party_id = get_val_from_request(request, 'id')
-    party_ref = db.collection('parties').document(party_id)
-    try:
-        party_ref.get().to_dict()
-        return 'Found'
-    except google.cloud.exceptions.NotFound:
-        return 'Not found'
+    return str(db.collection('parties').document(get_val_from_request(request, 'id')).get().exists)
+
+    #party_id = get_val_from_request(request, 'id')
+    #party_ref = db.collection('parties').document(party_id)
+
+
+    #try:
+    #    party_ref.get().to_dict()
+    #    return 'Found'
+    #except google.cloud.exceptions.NotFound:
+    #    return 'Not found'
 
 
 def get_facts(request):
