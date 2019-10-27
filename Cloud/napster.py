@@ -91,8 +91,7 @@ def tag(id):
 
 #### GENRE MAP CODE
 
-def create_genre_json(sp, playlist_id):
-	isrc_list = playlist_to_isrc(sp, playlist_id)
+def create_genre_json(isrc_list):
 	genremap = {}
 	for t in isrc_list:
 		try:
