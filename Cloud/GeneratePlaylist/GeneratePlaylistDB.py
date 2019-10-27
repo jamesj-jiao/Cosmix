@@ -47,7 +47,7 @@ def generate_playlist(raw_loaded_genres, name, num):
     genre_index = np.array([i for i in range(len(genre_array))])
 
     def lookup_embedding(word):
-        db.collection('glove').where('word', '==', word).get()
+        db.collection('glove_2').where('word', '==', word).get()
 
     def keep_genre(genre_array):
         """A function that takes in an array of different genres and returns an array of genre embeddings.
@@ -59,7 +59,7 @@ def generate_playlist(raw_loaded_genres, name, num):
             genre = genre_array[i][0]
             for word in genre.split(): #For each word in each genre
                 try: #If the word embedding is found
-                    word_embedding = np.array(next(db.collection('glove').where('word', '==', word).stream()).to_dict()['c'])
+                    word_embedding = np.array(next(db.collection('glove_2').where('word', '==', word).stream()).to_dict()['c'])
                     genre_embedding = [a+b for a,b in zip(genre_embedding, word_embedding)] #Sum the word embeddings
                 except:
                     continue

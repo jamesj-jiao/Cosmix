@@ -56,19 +56,20 @@ def gen_playlist(request):
     playlist_name = get_val_from_request(request, 'name')
     num_songs = get_val_from_request(request, 'numSongs')
     party_id = get_val_from_request(request, 'id')
+    token = get_val_from_request(request, 'token')
 
-    isrc_list = db.collection('parties').document(party_id).get().to_dict()['allTracks']
+    all_isrcs = db.collection('parties').document(party_id).get().to_dict()['allTracks']
 
-    return json.dumps(generate_playlist(create_genre_json(isrc_list), playlist_name, int(num_songs)))
+    new_isrcs = generate_playlist(create_genre_json(all_isrcs), playlist_name, int(num_songs))
 
-     #FINISH!!
+    utils.new_playlist(playlist_name, new_isrcs, token)
 
 def playlists(request):
     """Return the user's playlists for a given token and service."""
     service = get_val_from_request(request, 'service')
     token = get_val_from_request(request, 'token')
     playlists = list(SERVICES[service]['playlists'](token))
-    playlists = [Playlist(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
+    playlists = [dict(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
     return json.dumps(playlists)
 
 
@@ -95,5 +96,5 @@ def save(request):
     token = get_val_from_request(request, 'token')
 
     party = db.collection('parties').document(party_id).get().to_dict()
-    isrcs = party['track_isrcs']
+    isrcs = party['filtTracks']
     utils.new_playlist(name, isrcs, token)
