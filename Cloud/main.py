@@ -9,8 +9,6 @@ from Cloud.GeneratePlaylist.GeneratePlaylist import create_playlist
 from Cloud.napster import *
 from Cloud.AddToPartyPlaylist import *
 
-
-
 CODE_ALPHABET = string.ascii_letters + string.digits
 
 default_app = firebase_admin.initialize_app()
@@ -30,7 +28,7 @@ SERVICES = {
 def new_party(request):
     pid = ''.join(secrets.choice(CODE_ALPHABET) for _ in range(10))
     db.collection('parties').doc(pid).set({
-        'members': [],
+        'allTracks': [],
     })
     return pid
 
@@ -45,10 +43,10 @@ def check_party(request):
 
 def join_party(request):
     pid = get_val_from_request(request, 'id')
-    username = get_val_from_request(request, 'username')
+    # username = get_val_from_request(request, 'username')
 
     party_ref = db.collection('parties').document(pid)
-    party_ref.update({'members': firestore.ArrayUnion([username])})
+    # party_ref.update({'members': firestore.ArrayUnion([username])})
 
 
 def gen_playlist(request):
