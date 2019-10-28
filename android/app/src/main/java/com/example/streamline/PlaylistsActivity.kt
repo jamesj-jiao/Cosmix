@@ -59,16 +59,11 @@ class PlaylistAdapter(var context: Context, val data: List<Playlist>) : Recycler
                 val progressDialog = ProgressDialog(context)
                 progressDialog.setTitle("Uploading...")
                 progressDialog.show()
-                AsyncUtils.add(partyID, curr.id, token, progressDialog) { found ->
-                    if (found) {
-                        val intent = Intent(it.context, PartyActivity::class.java)
-                        intent.putExtra("token", token)
-                        intent.putExtra(PARTY_ID, partyID)
-                        it.context.startActivity(intent)
-                    } else {
-                        Toast.makeText(it.context, "Playlist is empty. Cannot add.", Toast.LENGTH_SHORT).show()
-                    }
-                }
+                AsyncUtils.add(partyID, curr.id, token, progressDialog)
+                val intent = Intent(it.context, PartyActivity::class.java)
+                intent.putExtra("token", token)
+                intent.putExtra(PARTY_ID, partyID)
+                it.context.startActivity(intent)
             }
         }
     }

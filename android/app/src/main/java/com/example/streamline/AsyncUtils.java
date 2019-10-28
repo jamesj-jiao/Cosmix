@@ -86,12 +86,11 @@ public class AsyncUtils {
         return playlists;
     }
 
-    public static void add(String id, String playlist, String token, ProgressDialog toast, Consumer<Boolean> onFinish) {
-        Executors.newSingleThreadExecutor().submit(() -> {
+    public static void add(String id, String playlist, String token, ProgressDialog toast) {
+        Executors.newSingleThreadExecutor().execute(() -> {
             Log.wtf("TOAST","IT'S A TOAST");
             boolean found = CloudUtilsKt.add(id, playlist, token);
             toast.dismiss();
-            onFinish.accept(found);
         });
     }
 
