@@ -12,6 +12,8 @@
 # below:
 .git
 .gitignore
+.idea
+GeneratePlaylist/glove.6B
 
 node_modules
 #!include:.gitignore
