@@ -62,13 +62,21 @@ from sklearn.neighbors import KNeighborsClassifier
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(genre_embeddings, genre_index)
 
-def nearest_word(word):
-	word_embedding = np.array(keep_genre([word]))
-	closest_words = knn.kneighbors(word_embedding)
-	distances, neighbors = closest_words[0][0], closest_words[1][0]
+def gen_mood_playlist(mood, num_songs):
+	#binary search
+
+def gen_genre_playlist(genre, num_songs):
+	
+
+def create_playlist(title, num_songs):
+	title_embedding = np.array(keep_genre([title]))
+	closest_genres = knn.kneighbors(title_embedding)
+	distances, neighbors = closest_genres[0][0], closest_genres[1][0]
 	genres = [new_genre_array[neighbors[0]], new_genre_array[neighbors[1]], new_genre_array[neighbors[2]]]
-	print(distances)
-	print(genres)
+	if neighbors[0] in moods:
+		#binary search
+	else:
+
 
 """
 def create_playlist(title, num_ongs):
