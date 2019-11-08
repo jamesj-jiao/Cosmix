@@ -6,7 +6,7 @@ import utils
 # import secrets
 import string
 from schema import Playlist
-from GeneratePlaylist.GeneratePlaylistDB import generate_playlist
+#from GeneratePlaylist.GeneratePlaylistDB import generate_playlist
 from napster import *
 from AddToPartyPlaylist import *
 
@@ -33,7 +33,8 @@ def new_party(request):
 
 
 def check_party(request):
-    return str(db.collection('parties').document(get_val_from_request(request, 'id')).get().exists)
+    party_id = get_val_from_request(request, 'id')
+    return str(db.collection('parties').document(party_id).get().exists)
 
     #party_id = get_val_from_request(request, 'id')
     #party_ref = db.collection('parties').document(party_id)
@@ -69,8 +70,8 @@ def playlists(request):
     service = get_val_from_request(request, 'service')
     token = get_val_from_request(request, 'token')
     playlists = list(SERVICES[service]['playlists'](token))
-    playlists = [dict(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
-    return json.dumps(playlists)
+    dict_playlists = [dict(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
+    return json.dumps(dict_playlists)
 
 
 def add(request):

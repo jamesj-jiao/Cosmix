@@ -13,7 +13,7 @@
 .git
 .gitignore
 .idea
-GeneratePlaylist/glove.6B
+GeneratePlaylist
 
 node_modules
 #!include:.gitignore
