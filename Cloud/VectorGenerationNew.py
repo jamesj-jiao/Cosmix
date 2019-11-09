@@ -4,7 +4,15 @@ from utils import *
 # convert spotify_id to a string
 #input_json = '{"spotify_id_1": {"name": "Pure Water", "artist": "Migos", "acousticness": 0.7, "volume": 0.2}, "spotify_id_2": {"name": "Cold Water", "artist": "Justin Bieber", "acousticness": 0.9, "volume": 1.6}, "spotify_id_3": {"name": "Hello", "acousticness": 0.7}}'
 
-def vector_generation(sp, isrc_list):
+song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
+
+def check_attributes(dict):
+    for key in dict:
+        for attribute in song_attributes:
+            if attribute not in dict[key]:
+                print(key, 'error')
+
+def add_to_mix(sp, isrc_list):
     input_json = playlist_to_features_dict(sp, isrc_list)
     # print(input_json)
     # print(type(json_data)) : string
@@ -13,11 +21,9 @@ def vector_generation(sp, isrc_list):
     # parsed_json = (json.loads(json_data))
     # print(json.dumps(parsed_json, indent=4, sort_keys=True))
 
-    def make_dict(json_data):
-        loaded_json = json.loads(json.dumps(json_data))
-        new_json = loaded_json.replace("\'", "\"")
-        new_json = json.loads(new_json)
-        return new_json
+    song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
+
+
 
     def common_keys(json_data):
         ar = json_data[next(iter(json_data))]

@@ -85,6 +85,9 @@ def playlist_to_features_dict(isrc_list):
     #playlist_id = get_val_from_request(request, 'playlist')
     d = {}
     for isrc in isrc_list:
-        spotify_id = isrc_to_id(isrc)
-        d[id_to_isrc(spotify_id)] = features_from_id(spotify_id)
-    return str(d)
+        try:
+            spotify_id = isrc_to_id(isrc)
+            d[id_to_isrc(spotify_id)] = features_from_id(spotify_id)
+        except:
+            continue
+    return d

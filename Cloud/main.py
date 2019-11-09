@@ -25,7 +25,6 @@ SERVICES = {
     }
 }
 
-
 def new_party(request):
     party_id = get_val_from_request(request, 'id')
     db.collection('parties').document(party_id).set({'allTracks': [], 'filtTracks': []})

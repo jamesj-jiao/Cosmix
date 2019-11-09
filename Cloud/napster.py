@@ -106,6 +106,7 @@ def create_genre_json(isrc_list):
 				#print()
 		except:
 			pass
+	# print('done with json embedding')
 	return genremap
 
 
