@@ -12,10 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.streamline.AsyncUtils
-import com.example.streamline.PARTY_ID
-import com.example.streamline.PartyActivity
-import com.example.streamline.R
+import com.example.streamline.*
 
 class CreateFragment : Fragment() {
 
@@ -47,6 +44,30 @@ class CreateFragment : Fragment() {
             text = "CREATE PARTY"
 
             setOnClickListener {
+//                with(partyText.text.toString()) {
+//                    if (isBlank()) {
+//                        partyText.error = "Must enter a party ID!"
+//                    } else if (contains(" ")) {
+//                        partyText.error = "Party ID cannot contain whitespace"
+//                    } else if (!matches(Regex("^[a-zA-Z0-9]*$"))) {
+//                        partyText.error = "Party ID must be alphanumeric"
+//                    } else {
+//                        checkIfMixExists(this).addOnCompleteListener {
+//                            Log.wtf("RESULT", it.result.toString())
+//                            if (getDict(it.result as String)["result"] as Boolean) {
+//                                partyText.error = "Party already exists!"
+//                            } else {
+//                                createMix(this).addOnCompleteListener {
+//                                    val partyIntent = Intent(context, PartyActivity::class.java)
+//                                    partyIntent.putExtra(PARTY_ID, this)
+//                                    startActivity(partyIntent)
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+
+
                 val partyID: String = partyText.text.toString()
                 if (partyID.isBlank()) {
                     partyText.error = "Must enter a party ID!"
@@ -58,9 +79,7 @@ class CreateFragment : Fragment() {
                     partyText.error = "Party already exists!"
                 } else {
                     AsyncUtils.newParty(partyID)
-                    val partyIntent = Intent(context, PartyActivity::class.java)
-                    partyIntent.putExtra(PARTY_ID, partyID);
-                    startActivity(partyIntent)
+
                 }
             }
         }

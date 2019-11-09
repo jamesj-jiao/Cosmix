@@ -34,7 +34,7 @@ def new_party(request):
 
 def check_party(request):
     party_id = get_val_from_request(request, 'id')
-    return str(db.collection('parties').document(party_id).get().exists)
+    return json.dumps(dict(result=db.collection('parties').document(party_id).get().exists))
 
     #party_id = get_val_from_request(request, 'id')
     #party_ref = db.collection('parties').document(party_id)
@@ -50,7 +50,7 @@ def check_party(request):
 def get_facts(request):
     isrc = get_val_from_request(request, 'isrc')
     if isrc:
-        return str(isrc_to_facts(isrc))
+        return json.dumps(str(isrc_to_facts(isrc)))
     return "Problem with get_facts"
 
 def gen_filter(request):

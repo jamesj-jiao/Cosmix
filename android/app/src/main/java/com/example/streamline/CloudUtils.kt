@@ -17,7 +17,7 @@ const val ADD = "add"
 const val SAVE = "save"
 const val SAVE_GENRE = "gen_playlist"
 
-fun callFunction(url: String, params: Map<String, String>) : String {
+private fun callFunction(url: String, params: Map<String, String>) : String {
 
     var formatted = "$url?"
 
@@ -40,24 +40,10 @@ fun callFunction(url: String, params: Map<String, String>) : String {
     return response
 }
 
-fun getDict(json: String) : Map<String, String> {
-    val gson = Gson()
-    val map = gson.fromJson(json, Map::class.java)
-    return map as Map<String, String>
-}
-
-fun getList(list: String) : List<Map<String, String>> {
-    val gson = Gson()
-    val map = gson.fromJson(list, List::class.java)
-    return map as List<Map<String, String>>
-}
-
-
-
 fun getSongFacts(isrc: String) : Map<String, String> = getDict(callFunction("$FUNCTION$GET_FACTS", mapOf(Pair("isrc", isrc))))
 
 fun checkParty(partyId: String) : Boolean =
-    callFunction("$FUNCTION$CHECK_PARTY", mapOf(Pair("id", partyId))) == "True"
+    getDict(callFunction("$FUNCTION$CHECK_PARTY", mapOf(Pair("id", partyId))))["result"] as Boolean
 
 fun newParty(partyId: String) : Boolean =
     callFunction("$FUNCTION$NEW_PARTY", mapOf(Pair("id", partyId))) == "Success"

@@ -1,6 +1,5 @@
-from apple import *
 from spotify import *
-
+from apple import *
 
 def get_val_from_request(request, key):
     request_json = request.get_json()
