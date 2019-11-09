@@ -16,8 +16,9 @@ const val PLAYLISTS = "playlists"
 const val ADD = "add"
 const val SAVE = "save"
 const val SAVE_GENRE = "gen_playlist"
+const val GEN_FILTER = "gen_filter"
 
-private fun callFunction(url: String, params: Map<String, String>) : String {
+private fun callFunction(url: String, params: Map<String, Any>) : String {
 
     var formatted = "$url?"
 
@@ -49,7 +50,7 @@ fun newParty(partyId: String) : Boolean =
     callFunction("$FUNCTION$NEW_PARTY", mapOf(Pair("id", partyId))) == "Success"
 
 fun playlists(service: String, token: String) : List<Map<String, String>> {
-    return getList(callFunction("$FUNCTION$PLAYLISTS", mapOf(Pair("service", service), Pair("token", token))))
+    return getMapList(callFunction("$FUNCTION$PLAYLISTS", mapOf(Pair("service", service), Pair("token", token))))
 }
 
 fun add(id: String, playlist: String, token: String) : Boolean {
@@ -71,3 +72,9 @@ fun save(partyId: String, name: String, token: String) {
 fun saveGenre(partyId: String, name: String, token: String) {
     callFunction("$FUNCTION$SAVE_GENRE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token), Pair("numSongs", "5")))
 }
+
+fun genFilter(name: String, numSongs: Int, partyID: String) : List<String> = Gson().fromJson(callFunction("$FUNCTION$GEN_FILTER", mapOf(
+    "name" to name,
+    "numSongs" to numSongs,
+    "id" to partyID
+)), List::class.java) as List<String>

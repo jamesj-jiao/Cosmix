@@ -3,6 +3,7 @@ package com.example.streamline
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,8 +30,28 @@ class PartyActivity : AppCompatActivity() {
 
     val CHOOSE_PLAYLIST_RESULT_CODE = 100
     val REQUEST_CODE = 1337
+    val ADD_TO_SPOTIFY = 123
     val CLIENT_ID = "2fd46a7902e043e4bcb8ccda3d1381b2"
     val REDIRECT_URI = "http://com.example.streamline/callback"
+
+    val db = FirebaseFirestore.getInstance()
+
+    lateinit var lastPlaylistName: String
+
+    class GenTask(val filter: String, val partyId: String, val adapter: Adapter) : AsyncTask<Void, Void, List<String>>() {
+        override fun doInBackground(vararg params: Void?): List<String> {
+            val isrcs: List<String> = genFilter(filter, 5, partyId)
+
+            return isrcs
+        }
+
+        override fun onPostExecute(result: List<String>?) {
+            if (result != null) {
+                adapter.updateData(AsyncUtils.getSongs(result))
+                Log.wtf("FINISHED GEN PLAYLIST", "${result.size} : ${result[0]}")
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,47 +59,56 @@ class PartyActivity : AppCompatActivity() {
 
         partyId = intent.getStringExtra(PARTY_ID)
 
-        FirebaseFirestore.getInstance().collection(PARTIES).document(partyId)
-            .addSnapshotListener { snapshot, _ ->
-                if (snapshot?.data != null) {
-                    var data = snapshot.data as Map<String, List<String>>
-                    initRecycler()
-                    adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
-                }
+        initRecycler()
+
+        db.collection(PARTIES).document(partyId).get().addOnCompleteListener {
+            if (it.isSuccessful) {
+                val data = it.result?.data as Map<String, List<String>>
+                adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
+            } else {
+                Log.wtf("FIRESTORE", "GET REQUEST FAILED")
             }
-
-        findViewById<Button>(R.id.spotifylogin).setOnClickListener {
-                val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
-
-                builder.setScopes(arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-private"))
-                val request = builder.build()
-
-                AuthenticationClient.openLoginActivity(this, REQUEST_CODE, request)
         }
 
+//        FirebaseFirestore.getInstance().collection(PARTIES).document(partyId)
+//            .addSnapshotListener { snapshot, _ ->
+//                if (snapshot?.data != null) {
+//                    var data = snapshot.data as Map<String, List<String>>
+//                    initRecycler()
+//
+//                    Log.wtf("HELLLO", "SDFHSDFHKJSDFH")
+//
+//                    adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
+//                }
+//            }
+
+        findViewById<Button>(R.id.addPlaylist).setOnClickListener {
+            getSpotifyToken(REQUEST_CODE)
+        }
 
         findViewById<Button>(R.id.spotifyadd).setOnClickListener {
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Playlist name")
 
-            var viewInflated = LayoutInflater.from(this).inflate(R.layout.text_dialog, findViewById(android.R.id.content), false)
-            val input: EditText = viewInflated.findViewById(R.id.input)
-            builder.setView(viewInflated)
+            var viewInflater = LayoutInflater.from(this).inflate(R.layout.text_dialog, findViewById(android.R.id.content), false)
+
+            val input: EditText = viewInflater.findViewById(R.id.input)
+
+            builder.setView(viewInflater)
 
             builder.setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
                 if (authToken != null) {
-                    val toast = Toast.makeText(this@PartyActivity, "Uploadeding to Spotify", Toast.LENGTH_LONG * Toast.LENGTH_LONG * Toast.LENGTH_LONG)
-                    toast.show()
-                    AsyncUtils.save(partyId, input.text.toString(), authToken, toast)
+                    savePlaylistToSpotify(input.text.toString())
                 } else {
-                    Toast.makeText(this@PartyActivity, "Must log in to spotify first!", Toast.LENGTH_SHORT).show()
+                    lastPlaylistName = input.text.toString()
+                    getSpotifyToken(ADD_TO_SPOTIFY)
                 }
             })
             builder.setNegativeButton("Cancel", DialogInterface.OnClickListener() { dialog, which ->
                 dialog.cancel()
             })
 
-            builder.show();
+            builder.show()
         }
 
         findViewById<Button>(R.id.spotifygenre).setOnClickListener {
@@ -90,21 +120,34 @@ class PartyActivity : AppCompatActivity() {
             builder.setView(viewInflated)
 
             builder.setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                if (authToken != null) {
-                    var toast = Toast.makeText(this@PartyActivity, "Uploading to Spotify", Toast.LENGTH_LONG * Toast.LENGTH_LONG * Toast.LENGTH_LONG)
-                    toast.show()
-                    AsyncUtils.saveGenre(partyId, input.text.toString(), authToken, toast)
-                } else {
-                    Toast.makeText(this@PartyActivity, "Must log in to spotify first!", Toast.LENGTH_SHORT).show()
-                }
+
+                GenTask(input.text.toString(), partyId, adapter).execute()
+
+                Toast.makeText(this@PartyActivity, "Generating filtered playlist", Toast.LENGTH_LONG).show()
+
             })
             builder.setNegativeButton("Cancel", DialogInterface.OnClickListener() { dialog, which ->
                 dialog.cancel()
             })
 
-            builder.show();
+            builder.show()
         }
         initRecycler()
+    }
+
+    fun savePlaylistToSpotify(text: String) {
+        val toast = Toast.makeText(this@PartyActivity, "Uploadeding to Spotify", Toast.LENGTH_LONG * Toast.LENGTH_LONG * Toast.LENGTH_LONG)
+        toast.show()
+        AsyncUtils.save(partyId, text, authToken, toast)
+    }
+
+    fun getSpotifyToken(nextStep: Int) {
+        val builder = AuthenticationRequest.Builder(CLIENT_ID, AuthenticationResponse.Type.TOKEN, REDIRECT_URI)
+
+        builder.setScopes(arrayOf("playlist-read-private", "playlist-read-collaborative", "playlist-modify-private"))
+        val request = builder.build()
+
+        AuthenticationClient.openLoginActivity(this, nextStep, request)
     }
 
     fun initRecycler() {
@@ -134,6 +177,8 @@ class PartyActivity : AppCompatActivity() {
                     .putExtra("partyID", partyId)
                     , CHOOSE_PLAYLIST_RESULT_CODE)
             }
+        } else if (requestCode == ADD_TO_SPOTIFY) {
+            savePlaylistToSpotify(lastPlaylistName)
         }
     }
 

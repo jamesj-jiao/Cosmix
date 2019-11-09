@@ -12,10 +12,7 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.example.streamline.AsyncUtils
-import com.example.streamline.PARTY_ID
-import com.example.streamline.PartyActivity
-import com.example.streamline.R
+import com.example.streamline.*
 
 class JoinFragment : Fragment() {
 
@@ -46,19 +43,20 @@ class JoinFragment : Fragment() {
             text = "JOIN PARTY"
 
             setOnClickListener {
-                val partyID: String = partyText.text.toString()
-                if (partyID.isBlank()) {
-                    partyText.error = "Must enter a party ID!"
-                } else if (partyID.contains(" ")) {
-                    partyText.error = "Party ID cannot contain whitespace"
-                } else if (!partyID.matches(Regex("^[a-zA-Z0-9]*$"))) {
-                    partyText.error = "Party ID must be alphanumeric"
-                } else if (!AsyncUtils.checkParty(partyID)) {
-                    partyText.error = "Party doesn't exist!"
-                } else {
-                    val partyIntent = Intent(context, PartyActivity::class.java)
-                    partyIntent.putExtra(PARTY_ID, partyID);
-                    startActivity(partyIntent)
+                with(partyText.text.toString()) {
+                    if (isBlank()) {
+                        partyText.error = "Must enter a party ID!"
+                    } else if (contains(" ")) {
+                        partyText.error = "Party ID cannot contain whitespace"
+                    } else if (!matches(Regex("^[a-zA-Z0-9]*$"))) {
+                        partyText.error = "Party ID must be alphanumeric"
+                    }  else if (!AsyncUtils.checkParty(this)) {
+                        partyText.error = "Party doesn't exist!"
+                    } else {
+                        val partyIntent = Intent(context, PartyActivity::class.java)
+                        partyIntent.putExtra(PARTY_ID, this)
+                        startActivity(partyIntent)
+                    }
                 }
             }
         }

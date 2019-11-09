@@ -44,6 +44,11 @@ class CreateFragment : Fragment() {
             text = "CREATE PARTY"
 
             setOnClickListener {
+
+//                getFacts("AUFF01900128").addOnCompleteListener {
+//                    Log.wtf("FACTS", it.result.toString())
+//                }
+//
 //                with(partyText.text.toString()) {
 //                    if (isBlank()) {
 //                        partyText.error = "Must enter a party ID!"
@@ -79,7 +84,9 @@ class CreateFragment : Fragment() {
                     partyText.error = "Party already exists!"
                 } else {
                     AsyncUtils.newParty(partyID)
-
+                    val partyIntent = Intent(context, PartyActivity::class.java)
+                    partyIntent.putExtra(PARTY_ID, partyID)
+                    startActivity(partyIntent)
                 }
             }
         }

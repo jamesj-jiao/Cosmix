@@ -19,26 +19,28 @@
             android:orientation="vertical">
 
             <Button
-                android:id="@+id/spotifylogin"
+                android:id="@+id/addPlaylist"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Log in with Spotify"
+                android:text="Add Music"
                 android:textSize="30sp" />
+
             <Button
                 android:id="@+id/spotifyadd"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Add to Spotify"
+                android:text="Push to Spotify"
                 android:textSize="30sp" />
             <Button
                 android:id="@+id/spotifygenre"
                 style="@style/Widget.AppCompat.Button.Borderless"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Create new genre"
+                android:text="Filter"
                 android:textSize="30sp" />
+
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>

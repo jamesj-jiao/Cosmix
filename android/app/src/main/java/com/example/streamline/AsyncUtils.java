@@ -54,13 +54,7 @@ public class AsyncUtils {
     }
 
     public static void newParty(String partyID) {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        Future<Boolean> future = executor.submit(() -> CloudUtilsKt.newParty(partyID));
-        try {
-            future.get();
-        } catch (ExecutionException | InterruptedException e) {
-            e.printStackTrace();
-        }
+        Executors.newSingleThreadExecutor().execute(() -> CloudUtilsKt.newParty(partyID));
     }
 
     public static List<Playlist> getPlaylists(String service, String token){
@@ -106,5 +100,17 @@ public class AsyncUtils {
             CloudUtilsKt.saveGenre(id, name.replace(" ","%20"), token);
             toast.cancel();
         });
+    }
+
+    public static List<String> filterSongs(String name, int numSongs, String partyId) {
+        Future<List<String>> isrcs = Executors.newSingleThreadExecutor().submit(() -> CloudUtilsKt.genFilter(name, numSongs, partyId));
+        try {
+            return isrcs.get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
