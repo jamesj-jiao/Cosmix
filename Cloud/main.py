@@ -57,14 +57,18 @@ def gen_filter(request):
     filter_name = get_val_from_request(request, 'name')
     num_songs = get_val_from_request(request, 'numSongs')
     party_id = get_val_from_request(request, 'id')
-    token = get_val_from_request(request, 'token')
 
     all_isrcs = db.collection('parties').document(party_id).get().to_dict()['allTracks']
 
     new_isrcs = generate_filter(create_genre_json(all_isrcs), filter_name, int(num_songs))
 
-    utils.new_playlist(filter_name, new_isrcs, token)
     return json.dumps(new_isrcs)
+
+def save_isrcs(request):
+    isrc_list = get_val_from_request(request, "isrcs")
+    playlist_name = get_val_from_request(request, "name")
+    token = get_val_from_request(request, "token")
+    utils.new_playlist(playlist_name, isrc_list, token)
 
 def playlists(request):
     """Return the user's playlists for a given token and service."""
