@@ -6,6 +6,8 @@ from tensorflow import keras
 import json
 import random
 import string
+import pygn
+import pygn_login
 
 #reading genre map
 with open('genremap_full.json', 'r') as f:
