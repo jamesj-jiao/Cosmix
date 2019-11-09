@@ -25,7 +25,7 @@ def generate_filter(raw_loaded_genres, name, num):
 
 	loaded_genres = {}
 	for key in raw_loaded_genres:
-		loaded_genres[key.lower().replace('/', ' / ').replace('-', ' - ').replace('&', ' & ')] = raw_loaded_genres[key]
+		loaded_genres[key.lower().replace('/', ' ').replace('-', ' - ').replace('&', ' & ')] = raw_loaded_genres[key]
 
 	#create genre + mood array
 	genre_array = [key for key in loaded_genres]
@@ -62,7 +62,7 @@ def generate_filter(raw_loaded_genres, name, num):
 
 	#creates filter based on imput name and number of songs in filter
 	def create_filter(title, num_songs):
-		title = title.lower().replace('/', ' / ').replace('-', ' - ').replace('&', ' & ')
+		title = title.lower().replace('/', ' ').replace('-', ' - ').replace('&', ' & ')
 		title_embedding = np.array(keep_genre([title]))
 		closest_genres = knn.kneighbors(title_embedding)
 		distances, neighbors = closest_genres[0][0], closest_genres[1][0]
