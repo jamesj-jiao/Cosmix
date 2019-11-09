@@ -6,7 +6,7 @@ import utils
 # import secrets
 import string
 from schema import Playlist
-#from GeneratePlaylist.GeneratePlaylistDB import generate_playlist
+from GenerateFilter.GenerateFilterDB import generate_filter
 from napster import *
 from AddToPartyPlaylist import *
 
@@ -53,17 +53,18 @@ def get_facts(request):
         return str(isrc_to_facts(isrc))
     return "Problem with get_facts"
 
-def gen_playlist(request):
-    playlist_name = get_val_from_request(request, 'name')
+def gen_filter(request):
+    filter_name = get_val_from_request(request, 'name')
     num_songs = get_val_from_request(request, 'numSongs')
     party_id = get_val_from_request(request, 'id')
     token = get_val_from_request(request, 'token')
 
     all_isrcs = db.collection('parties').document(party_id).get().to_dict()['allTracks']
 
-    new_isrcs = generate_playlist(create_genre_json(all_isrcs), playlist_name, int(num_songs))
+    new_isrcs = generate_filter(create_genre_json(all_isrcs), filter_name, int(num_songs))
 
-    utils.new_playlist(playlist_name, new_isrcs, token)
+    utils.new_playlist(filter_name, new_isrcs, token)
+    return json.dumps(new_isrcs)
 
 def playlists(request):
     """Return the user's playlists for a given token and service."""

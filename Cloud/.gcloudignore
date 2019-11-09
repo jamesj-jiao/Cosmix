@@ -13,7 +13,7 @@
 .git
 .gitignore
 .idea
-GeneratePlaylist
+GenerateFilter/glove.6B
 
 node_modules
 #!include:.gitignore

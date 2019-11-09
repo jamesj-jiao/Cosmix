@@ -1,8 +1,6 @@
 import os
 import sys
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras
 from sklearn.neighbors import KNeighborsClassifier
 import json
 import random

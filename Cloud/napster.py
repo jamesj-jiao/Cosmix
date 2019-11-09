@@ -108,6 +108,7 @@ def create_genre_json(isrc_list):
 			pass
 	return genremap
 
+
 #sp = spotipy.Spotify(auth="BQA7TSell4nnxO4laytS_Do9KIlhJo1HCi1cvR40o6sy60WMeBDXxKSVxPjY6yvwzd4durNTuO3M9EwCNTSWSgcSv2CLptUM0I9c1aHxgyOO40tOstNUqvwkGLY6MOkozQFTEEahveQhkkB4nguIcg4cECs2je7-8Qn3XR_Ep2_-pIp-xQ5Q-jMWODRkXAdvLKsHI40VSiEkZW9mbJl21w")
 #create_genre_json(sp, '3atj13mrB86ZfC8amwAVst')
 #print(list(playlists()))
