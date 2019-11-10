@@ -96,7 +96,10 @@ def playlists(request):
 
 #     new_isrcs = list(set(playlist_isrcs) - set(mix_isrcs).union(set(playlist_isrcs)))
 
-#     party_ref.update({'filtTracks': add_to_mix(new_isrcs, filt_isrcs, avg_vec, len(mix_isrcs), num=10)})
+#     new_avg_vec, new_filt_isrcs = add_to_mix(new_isrcs, filt_isrcs, avg_vec, len(mix_isrcs), num=10)
+
+#     party_ref.update({'averageVector': new_avg_vec})
+#     party_ref.update({'filtTracks': new_filt_isrcs})
 
 
 def add(request):
