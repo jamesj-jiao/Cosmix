@@ -13,7 +13,10 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.spotify.sdk.android.authentication.AuthenticationClient
 import com.spotify.sdk.android.authentication.AuthenticationRequest
 import com.spotify.sdk.android.authentication.AuthenticationResponse
@@ -36,51 +39,30 @@ class PartyActivity : AppCompatActivity() {
 
     val db = FirebaseFirestore.getInstance()
 
+    lateinit var currListener: ListenerRegistration
+
     lateinit var lastPlaylistName: String
-
-    class GenTask(val filter: String, val partyId: String, val adapter: Adapter) : AsyncTask<Void, Void, List<String>>() {
-        override fun doInBackground(vararg params: Void?): List<String> {
-            val isrcs: List<String> = genFilter(filter, 5, partyId)
-
-            return isrcs
-        }
-
-        override fun onPostExecute(result: List<String>?) {
-            if (result != null) {
-                adapter.updateData(AsyncUtils.getSongs(result))
-                Log.wtf("FINISHED GEN PLAYLIST", "${result.size} : ${result[0]}")
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_party)
 
+        initRecycler()
+
         partyId = intent.getStringExtra(PARTY_ID)
 
         initRecycler()
 
-        db.collection(PARTIES).document(partyId).get().addOnCompleteListener {
-            if (it.isSuccessful) {
-                val data = it.result?.data as Map<String, List<String>>
-                adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
-            } else {
-                Log.wtf("FIRESTORE", "GET REQUEST FAILED")
-            }
-        }
-
-//        FirebaseFirestore.getInstance().collection(PARTIES).document(partyId)
-//            .addSnapshotListener { snapshot, _ ->
-//                if (snapshot?.data != null) {
-//                    var data = snapshot.data as Map<String, List<String>>
-//                    initRecycler()
-//
-//                    Log.wtf("HELLLO", "SDFHSDFHKJSDFH")
-//
-//                    adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
-//                }
+//        db.collection(PARTIES).document(partyId).get().addOnCompleteListener {
+//            if (it.isSuccessful) {
+//                val data = it.result?.data as Map<String, List<String>>
+//                adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
+//            } else {
+//                Log.wtf("FIRESTORE", "GET REQUEST FAILED")
 //            }
+//        }
+
+        startRealTime()
 
         findViewById<Button>(R.id.addPlaylist).setOnClickListener {
             getSpotifyToken(REQUEST_CODE)
@@ -109,6 +91,8 @@ class PartyActivity : AppCompatActivity() {
             })
 
             builder.show()
+
+            startRealTime()
         }
 
         findViewById<Button>(R.id.spotifygenre).setOnClickListener {
@@ -121,6 +105,21 @@ class PartyActivity : AppCompatActivity() {
 
             builder.setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
 
+                class GenTask(val filter: String, val partyId: String, val adapter: Adapter) : AsyncTask<Void, Void, List<String>>() {
+                    override fun doInBackground(vararg params: Void?): List<String> {
+                        val isrcs: List<String> = genFilter(filter, 5, partyId)
+
+                        return isrcs
+                    }
+
+                    override fun onPostExecute(result: List<String>?) {
+                        if (result != null) {
+                            stopRealTime()
+                            adapter.updateData(AsyncUtils.getSongs(result))
+                        }
+                    }
+                }
+
                 GenTask(input.text.toString(), partyId, adapter).execute()
 
                 Toast.makeText(this@PartyActivity, "Generating filtered playlist", Toast.LENGTH_LONG).show()
@@ -132,7 +131,21 @@ class PartyActivity : AppCompatActivity() {
 
             builder.show()
         }
-        initRecycler()
+    }
+
+    fun startRealTime() {
+        currListener = db.collection(PARTIES).document(partyId)
+            .addSnapshotListener { snapshot, _ ->
+                if (snapshot?.data != null) {
+                    var data = snapshot.data as Map<String, List<String>>
+                    Log.d("BBBB", data.toString())
+                    adapter.updateData(AsyncUtils.getSongs(data[FILTERED_TRACKS]))
+                }
+            }
+    }
+
+    fun stopRealTime() {
+        currListener.remove()
     }
 
     fun savePlaylistToSpotify(text: String) {
