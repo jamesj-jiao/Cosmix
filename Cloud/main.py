@@ -9,6 +9,7 @@ from schema import Playlist
 from GenerateFilter.GenerateFilterDB import generate_filter
 from napster import *
 from AddToPartyPlaylist import *
+from VectorGenerationNew import *
 
 CODE_ALPHABET = string.ascii_letters + string.digits
 
@@ -27,7 +28,7 @@ SERVICES = {
 
 def new_party(request):
     party_id = get_val_from_request(request, 'id')
-    db.collection('parties').document(party_id).set({'allTracks': [], 'filtTracks': []})
+    db.collection('parties').document(party_id).set({'allTracks': [], 'filtTracks': [], 'averageVector': [0]*num_attributes})
     return 'Success'
 
 
@@ -76,6 +77,26 @@ def playlists(request):
     playlists = list(SERVICES[service]['playlists'](token))
     dict_playlists = [dict(id=service + '/' + p.id, name=p.name, image=p.image) for p in playlists]
     return json.dumps(dict_playlists)
+
+# def add(request):
+#     party_id = get_val_from_request(request, 'id')
+#     combined_id = get_val_from_request(request, 'playlist')
+#     token = get_val_from_request(request, 'token')
+
+#     party_ref = db.collection('parties').document(party_id)
+
+#     service, playlist_id = combined_id.split('/')
+#     playlist_isrcs = SERVICES[service]['track_isrcs'](playlist_id, token)
+
+#     party_ref.update({'allTracks': firestore.ArrayUnion(track_isrcs)})
+#     party = db.collection('parties').document(party_id).get().to_dict()
+#     mix_isrcs = party['allTracks']
+#     filt_isrcs = party['filtTracks']
+#     avg_vec = party['averageVector']
+
+#     new_isrcs = list(set(playlist_isrcs) - set(mix_isrcs).union(set(playlist_isrcs)))
+
+#     party_ref.update({'filtTracks': add_to_mix(new_isrcs, filt_isrcs, avg_vec, num=10)})
 
 
 def add(request):

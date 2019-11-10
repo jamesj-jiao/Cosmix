@@ -1,29 +1,24 @@
 import json
 from utils import *
 
-# convert spotify_id to a string
-#input_json = '{"spotify_id_1": {"name": "Pure Water", "artist": "Migos", "acousticness": 0.7, "volume": 0.2}, "spotify_id_2": {"name": "Cold Water", "artist": "Justin Bieber", "acousticness": 0.9, "volume": 1.6}, "spotify_id_3": {"name": "Hello", "acousticness": 0.7}}'
-
 song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
+num_attributes = len(song_attributes)
+feature_dict = playlist_to_features_dict(isrc_list)
 
-def check_attributes(dict):
-    for key in dict:
-        for attribute in song_attributes:
-            if attribute not in dict[key]:
-                print(key, 'error')
+# def check_attributes(dict):
+#     for key in dict:
+#         for attribute in song_attributes:
+#             if attribute not in dict[key]:
+#                 print(key, 'error')
 
-def add_to_mix(sp, isrc_list):
-    input_json = playlist_to_features_dict(sp, isrc_list)
-    # print(input_json)
-    # print(type(json_data)) : string
+def add_to_mix(new_isrcs, filt_isrcs, avg_vec, num):
 
-    # with open("spotifysongs.json", "r") as f:
-    # parsed_json = (json.loads(json_data))
-    # print(json.dumps(parsed_json, indent=4, sort_keys=True))
-
-    song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
-
-
+    #add to genre database
+    new_isrcs_vec = []
+    for isrc in new_isrcs:
+        isrc_vec = [0]*num_attributes
+        for index, attribute in enumerate(song_attributes):
+            isrc_vec[index] = feature_dict[isrc][attribute]
 
     def common_keys(json_data):
         ar = json_data[next(iter(json_data))]
