@@ -2,4 +2,4 @@ __pycache__
 old repo
 .DS_Store
 glove.6B
-Cloud/ServiceAccountKey.json
+Cloud/GenerateFilter/ServiceAccountKey.json

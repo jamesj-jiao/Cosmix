@@ -1,107 +1,75 @@
 import json
 from utils import *
-
-# convert spotify_id to a string
-#input_json = '{"spotify_id_1": {"name": "Pure Water", "artist": "Migos", "acousticness": 0.7, "volume": 0.2}, "spotify_id_2": {"name": "Cold Water", "artist": "Justin Bieber", "acousticness": 0.9, "volume": 1.6}, "spotify_id_3": {"name": "Hello", "acousticness": 0.7}}'
+from scipy.spatial import distance
 
 song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
+num_attributes = len(song_attributes)
+feature_dict = playlist_to_features_dict(isrc_list)
 
-def check_attributes(dict):
-    for key in dict:
-        for attribute in song_attributes:
-            if attribute not in dict[key]:
-                print(key, 'error')
+# def check_attributes(dict):
+#     for key in dict:
+#         for attribute in song_attributes:
+#             if attribute not in dict[key]:
+#                 print(key, 'error')
 
-def add_to_mix(sp, isrc_list):
-    input_json = playlist_to_features_dict(sp, isrc_list)
-    # print(input_json)
-    # print(type(json_data)) : string
+def add_to_mix(new_isrcs, filt_isrcs, avg_vec, total_songs, num):
 
-    # with open("spotifysongs.json", "r") as f:
-    # parsed_json = (json.loads(json_data))
-    # print(json.dumps(parsed_json, indent=4, sort_keys=True))
+    all_isrcs = isrc_list[:].extend(filt_isrcs)
+    feature_dict = playlist_to_features_dict(all_isrcs)
 
-    song_attributes = {'acousticness', 'danceability', 'energy', 'instrumentalness', 'liveness', 'loudness', 'speechiness', 'valence', 'tempo'}
+    #add to genre database
 
+    #vectorize new_isrcs
+    new_isrcs_vec = []
+    new_isrcs_avg_vec = [0]*num_attributes
+    for isrc in new_isrcs:
+        isrc_vec = [isrc] + [0]*num_attributes
+        for index, attribute in enumerate(song_attributes):
+            isrc_vec[index + 1] = feature_dict[isrc][attribute]
+            new_isrcs_avg_vec[index] += isrc_vec[index + 1]
+        new_isrcs.append(isrc_vec)
 
+    for i in range(num_attributes):
+        new_isrcs_avg_vec[i] /= num_attributes
 
-    def common_keys(json_data):
-        ar = json_data[next(iter(json_data))]
+    #vectorize filt_isrcs
+    filt_isrcs_vec = []
+    for isrc in filt_isrcs:
+        isrc_vec = [isrc] + [0]*num_attributes
+        for index, attribute in enumerate(song_attributes):
+            isrc_vec[index + 1] = feature_dict[isrc][attribute]
+        filt_isrcs_vec.append(isrc_vec)
 
-        ar = {key: 0 for key in ar if type(ar[key]) == float and key != "duration_ms" and key != "key" and key != "mode" and key != "time_signature"}
+    all_isrcs_vec = new_isrcs_vec[:].extend(filt_isrcs_vec)
 
-        # print("thisisAR:", ar)
-        for key in json_data:
-            for sub_key in json_data[key]:
-                #print("subkey: ", sub_key)
-                if type(json_data[key][sub_key]) is float and key != "duration_ms" and key != "key" and key != "mode" and key != "time_signature":
-                    ar[sub_key] = ar.get(sub_key, 0) + 1
+    #new avg of mix
+    new_avg_vec = []
+    for i in range(num_attributes):
+        new_avg_vec[i] = avg_vec[i] * (total_songs - len(new_isrcs)) / total_songs + new_isrcs_avg_vec[i] * len(new_isrcs) / total_songs
 
-        #for x in range(len(new_json[next(iter(new_json))])):
-        for key in ar:
-            if ar[key] < len(json_data):
-                ar[key] = -1
-                # print("this failed, ", key)
-        # print("new ar: ", ar)
-        return ar
+    def normalize_vectors(iscrs_vec, new_avg_vec):
+        max_vec = []
+        for index in range(num_attributes):
+            attribute_max = [new_avg_vec[index]]
+            for vec in iscrs_vec:
+                attribute_max.append(vec[index + 1])
+            max_vec.append(max(attribute_max))
+        for index in range(num_attributes):
+            new_avg_vec[index] /= max_vec[index]
+            for vec in iscrs_vec:
+                vec[index + 1] /= max_vec[index]
 
-    def not_common_keys(json_data):
-        "None"
+    def similar_songs(iscrs_vec, new_avg_vec, num):
+        song_similarity_list = []
+        similar_songs = []
+        for i in range(len(iscrs_vec)):
+            song_similarity_list.append([distance.euclidean(new_avg_vec, iscrs_vec[i][1:]), i])
+        song_similarity_list.sort(key = lambda song_pair: song_pair[0])
+        for song_pair in song_similarity_list[:num]:
+            similar_songs.append(iscrs_vec[song_pair[1]][0])
+        return similar_songs
 
+    normalize_vectors(all_isrcs_vec, new_avg_vec)
+    new_filt_isrcs = similar_songs(all_isrcs_vec, new_avg_vec, num)
 
-    def generate_arrays(new_json, array):
-        final_array = []
-        name_of_nums = []
-        index = []
-        for key in new_json:  # looking at each track's features
-            # print("key:", key)
-            ar = []
-            ar.append(key)
-            # print(new_json[key])
-            #index.append(new_json[key][0])
-            for smallkey in new_json[key]:
-                # print("smallkey:", smallkey)
-                if array.get(smallkey, 0) != -1:
-                    value = new_json[key][smallkey]
-                    if type(value) is float:
-                        ar.append(value)
-                        #if smallkey not in name_of_nums:
-                        #    name_of_nums.append(smallkey)
-                else:
-                    ar.append("None")
-            # print("ar: ", ar)
-            final_array.append(ar)
-        # print(finalArray)
-        return final_array
-
-
-    def normalize(final):
-        for x in range(len(final[0])):  # len(array[0])
-            # ar = [max(subArray[x]) for subArray in array if type(subArray[x]) is float]
-            ar = []
-            for subArray in final:
-                # print("subArray: ", subArray[x])
-                #print("subarray: ", subArray, " length: ", len(subArray))
-                if type(subArray[x]) is float:
-                    # print("subArray: ", subArray[x])
-                    ar.append(subArray[x])
-            # print("ar: ", ar)
-            if ar:
-                largest_val = max(ar)
-                smallest_val = min(ar)
-                for subArray in final:
-                    if type(subArray[x]) is float:
-                        subArray[x] = (subArray[x] - smallest_val) / (largest_val - smallest_val)
-
-
-    ar = common_keys(make_dict(input_json))
-
-    finalArray = generate_arrays(make_dict(input_json), ar)
-
-    normalize(finalArray)
-
-    return finalArray
-
-#print(finalArray)
-
-#print("FinalArray: ", finalArray, " namesArray: ", namesArray)
+    return new_avg_vec, new_filt_isrcs
