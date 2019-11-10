@@ -9,7 +9,7 @@ from schema import Playlist
 from GenerateFilter.GenerateFilterDB import generate_filter
 from napster import *
 from AddToPartyPlaylist import *
-from VectorGenerationNew import *
+#from VectorGenerationNew import *
 
 CODE_ALPHABET = string.ascii_letters + string.digits
 
@@ -96,7 +96,7 @@ def playlists(request):
 
 #     new_isrcs = list(set(playlist_isrcs) - set(mix_isrcs).union(set(playlist_isrcs)))
 
-#     party_ref.update({'filtTracks': add_to_mix(new_isrcs, filt_isrcs, avg_vec, num=10)})
+#     party_ref.update({'filtTracks': add_to_mix(new_isrcs, filt_isrcs, avg_vec, len(mix_isrcs), num=10)})
 
 
 def add(request):

@@ -11,14 +11,23 @@ feature_dict = playlist_to_features_dict(isrc_list)
 #             if attribute not in dict[key]:
 #                 print(key, 'error')
 
-def add_to_mix(new_isrcs, filt_isrcs, avg_vec, num):
+def add_to_mix(new_isrcs, filt_isrcs, avg_vec, total_songs, num):
+
+    all_isrcs = isrc_list[:].extend(filt_isrcs)
+    feature_dict = playlist_to_features_dict(all_isrcs)
 
     #add to genre database
+
     new_isrcs_vec = []
     for isrc in new_isrcs:
         isrc_vec = [0]*num_attributes
         for index, attribute in enumerate(song_attributes):
             isrc_vec[index] = feature_dict[isrc][attribute]
+        new_isrcs.append(isrc_vec)
+
+    #new avg of mix
+    for i in range(num_attributes):
+        
 
     def common_keys(json_data):
         ar = json_data[next(iter(json_data))]
