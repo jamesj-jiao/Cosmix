@@ -19,15 +19,21 @@ def add_to_mix(new_isrcs, filt_isrcs, avg_vec, total_songs, num):
     #add to genre database
 
     new_isrcs_vec = []
+    new_isrcs_avg_vec = [0]*num_attributes
     for isrc in new_isrcs:
         isrc_vec = [0]*num_attributes
         for index, attribute in enumerate(song_attributes):
             isrc_vec[index] = feature_dict[isrc][attribute]
+            new_isrcs_avg_vec[index] += isrc_vec[index]
         new_isrcs.append(isrc_vec)
 
-    #new avg of mix
     for i in range(num_attributes):
-        
+        new_isrcs_avg_vec[i] /= num_attributes
+
+    #new avg of mix
+    new_avg_vec = []
+    for i in range(num_attributes):
+        new_avg_vec[i] = avg_vec[i] * (total_songs - len(new_isrcs)) / total_songs + new_isrcs_avg_vec[i] * len(new_isrcs) / total_songs
 
     def common_keys(json_data):
         ar = json_data[next(iter(json_data))]
