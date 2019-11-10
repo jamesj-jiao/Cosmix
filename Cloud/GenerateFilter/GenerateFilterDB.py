@@ -31,6 +31,8 @@ def generate_filter(raw_loaded_genres, name, num):
 	genre_array = [key for key in loaded_genres]
 	new_genre_array = genre_array[:]
 
+	# print("starting keep_genre")
+
 	def keep_genre(genre_array):
 		"""A function that takes in an array of different genres and returns an array of genre embeddings. 
 		If a word isn't found within Glove, that word is simply taken out of the genre embedding. 
@@ -41,7 +43,7 @@ def generate_filter(raw_loaded_genres, name, num):
 			genre = genre_array[i]
 			for word in genre.split(): #For each word in each genre
 				try: #If the word embedding is found
-					word_embedding = np.array(next(db.collection('glove_2').where('word', '==', word).stream()).to_dict()['c'])
+					word_embedding = np.array(db.collection('glove').document(word).get().to_dict()['vector_embedding'])
 					genre_embedding = [a+b for a,b in zip(genre_embedding, word_embedding)] #Sum the word embeddings
 				except:
 					continue
@@ -55,17 +57,21 @@ def generate_filter(raw_loaded_genres, name, num):
 	genre_embeddings=np.array(keep_genre(genre_array))
 	genre_index = np.array([i for i in range(len(genre_embeddings))])
 
+	# print("finished keep_genre")
+
 	#knn
 	from sklearn.neighbors import KNeighborsClassifier
 	knn = KNeighborsClassifier(n_neighbors=3)
 	knn.fit(genre_embeddings, genre_index)
+
+	# print("finished knn")
 
 	#creates filter based on imput name and number of songs in filter
 	def create_filter(title, num_songs):
 		title = title.lower().replace('/', ' ').replace('-', ' - ').replace('&', ' & ')
 		title_embedding = np.array(keep_genre([title]))
 		closest_genres = knn.kneighbors(title_embedding)
-		distances, neighbors = closest_genres[0][0], closest_genres[1][0]
+		neighbors = closest_genres[1][0]
 		genres = [new_genre_array[neighbors[0]], new_genre_array[neighbors[1]], new_genre_array[neighbors[2]]]
 		filtered_mix, curr_neighbor = [], 0
 		while len(filtered_mix) < num_songs and curr_neighbor <= 2:
