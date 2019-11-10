@@ -26,7 +26,7 @@ class Adapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHold
     }
 
     fun updateData(newData: Set<Song>) {
-        songs = (songs union newData).toMutableList()
+        songs = newData.toMutableList()
         notifyDataSetChanged()
     }
 

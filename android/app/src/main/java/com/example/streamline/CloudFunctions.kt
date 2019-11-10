@@ -17,7 +17,7 @@ fun getDict(json: String) : Map<String, String> {
     return map as Map<String, String>
 }
 
-fun getList(list: String) : List<Map<String, String>> {
+fun getMapList(list: String) : List<Map<String, String>> {
     val gson = Gson()
     val map = gson.fromJson(list, List::class.java)
     return map as List<Map<String, String>>

@@ -50,7 +50,7 @@ def check_party(request):
 def get_facts(request):
     isrc = get_val_from_request(request, 'isrc')
     if isrc:
-        return json.dumps(str(isrc_to_facts(isrc)))
+        return json.dumps(isrc_to_facts(isrc))
     return "Problem with get_facts"
 
 def gen_filter(request):
