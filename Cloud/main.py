@@ -53,6 +53,11 @@ def get_facts(request):
         return json.dumps(isrc_to_facts(isrc))
     return "Problem with get_facts"
 
+def get_facts_list(request):
+    party_id = get_val_from_request(request, 'id')
+    isrc_dict = db.collection('parties').document(party_id).get().get('filtTracks')
+    return json.dumps([isrc_to_facts(isrc) for isrc in isrc_dict])
+
 def gen_filter(request):
     filter_name = get_val_from_request(request, 'name')
     num_songs = get_val_from_request(request, 'numSongs')

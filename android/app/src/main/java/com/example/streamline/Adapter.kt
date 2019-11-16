@@ -25,8 +25,8 @@ class Adapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHold
         return ViewHolder(LayoutInflater.from(context).inflate(R.layout.song_row, parent, false))
     }
 
-    fun updateData(newData: Set<Song>) {
-        songs = newData.toMutableList()
+    fun updateData(newData: MutableList<Song>) {
+        songs = newData
         notifyDataSetChanged()
     }
 

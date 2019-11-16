@@ -16,7 +16,7 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 
 public class AsyncUtils {
-    public static Set<Song> getSongs(List<String> ids) {
+    public static List<Song> getSongs(List<String> ids) {
         ExecutorService executor = Executors.newCachedThreadPool();
 
         List<Future<Song>> futures = new ArrayList<>();
@@ -25,7 +25,7 @@ public class AsyncUtils {
             futures.add(executor.submit(() -> {
                 Map<String, String> songDict = CloudUtilsKt.getSongFacts(isrc);
 
-                return new Song(isrc, songDict.get("name"), songDict.get("artist"));
+                return new Song(songDict.get("name"), songDict.get("artist"));
             }));
         }
 
@@ -39,7 +39,11 @@ public class AsyncUtils {
             }
         }
 
-        return songs;
+        //return songs
+
+        List<Song> deprecatedSet = new ArrayList<Song>();
+        deprecatedSet.add(new Song("DEPRECATED", "SHOULND'T BE USING GETSONGS METHOD"));
+        return deprecatedSet;
     }
 
     public static boolean checkParty(String partyID) {
@@ -109,6 +113,15 @@ public class AsyncUtils {
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static List<Map<String, String>> getPartySongs(String partyId) {
+        try {
+            return Executors.newSingleThreadExecutor().submit(() -> CloudUtilsKt.getFactsList(partyId)).get();
+        } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;

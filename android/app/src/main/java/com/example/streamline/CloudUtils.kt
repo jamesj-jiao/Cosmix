@@ -17,10 +17,11 @@ const val ADD = "add"
 const val SAVE = "save"
 const val SAVE_GENRE = "gen_playlist"
 const val GEN_FILTER = "gen_filter"
+const val GET_FACTS_LIST = "get_facts_list"
 
-private fun callFunction(url: String, params: Map<String, Any>) : String {
+private fun callFunction(name: String, params: Map<String, Any>) : String {
 
-    var formatted = "$url?"
+    var formatted = "$FUNCTION$name?"
 
     for ((param, value) in params) {
         formatted = formatted.plus("&$param=$value")
@@ -41,22 +42,22 @@ private fun callFunction(url: String, params: Map<String, Any>) : String {
     return response
 }
 
-fun getSongFacts(isrc: String) : Map<String, String> = getDict(callFunction("$FUNCTION$GET_FACTS", mapOf(Pair("isrc", isrc))))
+fun getSongFacts(isrc: String) : Map<String, String> = getDict(callFunction(GET_FACTS, mapOf(Pair("isrc", isrc))))
 
 fun checkParty(partyId: String) : Boolean =
-    getDict(callFunction("$FUNCTION$CHECK_PARTY", mapOf(Pair("id", partyId))))["result"] as Boolean
+    getDict(callFunction(CHECK_PARTY, mapOf(Pair("id", partyId))))["result"] as Boolean
 
 fun newParty(partyId: String) : Boolean =
-    callFunction("$FUNCTION$NEW_PARTY", mapOf(Pair("id", partyId))) == "Success"
+    callFunction(NEW_PARTY, mapOf(Pair("id", partyId))) == "Success"
 
 fun playlists(service: String, token: String) : List<Map<String, String>> {
-    return getMapList(callFunction("$FUNCTION$PLAYLISTS", mapOf(Pair("service", service), Pair("token", token))))
+    return getMapList(callFunction(PLAYLISTS, mapOf(Pair("service", service), Pair("token", token))))
 }
 
 fun add(id: String, playlist: String, token: String) : Boolean {
     try {
         callFunction(
-            "$FUNCTION$ADD",
+            ADD,
             mapOf(Pair("id", id), Pair("playlist", playlist), Pair("token", token))
         )
         return true
@@ -66,15 +67,17 @@ fun add(id: String, playlist: String, token: String) : Boolean {
 }
 
 fun save(partyId: String, name: String, token: String) {
-    callFunction("$FUNCTION$SAVE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token)))
+    callFunction(SAVE, mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token)))
 }
 
 fun saveGenre(partyId: String, name: String, token: String) {
-    callFunction("$FUNCTION$SAVE_GENRE", mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token), Pair("numSongs", "5")))
+    callFunction(SAVE_GENRE, mapOf(Pair("id", partyId), Pair("name", name), Pair("token", token), Pair("numSongs", "5")))
 }
 
-fun genFilter(name: String, numSongs: Int, partyID: String) : List<String> = Gson().fromJson(callFunction("$FUNCTION$GEN_FILTER", mapOf(
+fun genFilter(name: String, numSongs: Int, partyID: String) : List<String> = Gson().fromJson(callFunction(GEN_FILTER, mapOf(
     "name" to name,
     "numSongs" to numSongs,
     "id" to partyID
 )), List::class.java) as List<String>
+
+fun getFactsList(id: String) : List<Map<String, String>> = Gson().fromJson(callFunction(GET_FACTS_LIST, mapOf(Pair("id", id))), List::class.java) as List<Map<String, String>>

@@ -51,8 +51,6 @@ class PartyActivity : AppCompatActivity() {
 
         partyId = intent.getStringExtra(PARTY_ID)
 
-        initRecycler()
-
 //        db.collection(PARTIES).document(partyId).get().addOnCompleteListener {
 //            if (it.isSuccessful) {
 //                val data = it.result?.data as Map<String, List<String>>
@@ -62,7 +60,8 @@ class PartyActivity : AppCompatActivity() {
 //            }
 //        }
 
-        startRealTime()
+        //startRealTime()
+        fillAdapter()
 
         findViewById<Button>(R.id.addPlaylist).setOnClickListener {
             getSpotifyToken(REQUEST_CODE)
@@ -131,6 +130,20 @@ class PartyActivity : AppCompatActivity() {
 
             builder.show()
         }
+    }
+
+    fun fillAdapter() {
+        class FillTask() : AsyncTask<Void, Void, List<Map<String, String>>>() {
+            override fun doInBackground(vararg params: Void?): List<Map<String, String>> {
+                return AsyncUtils.getPartySongs(partyId)
+            }
+
+            override fun onPostExecute(result: List<Map<String, String>>?) {
+                result?.forEach { adapter.addSong(Song(it.getValue("name"), it.getValue("artist"))) }
+            }
+        }
+
+        FillTask().execute()
     }
 
     fun startRealTime() {
